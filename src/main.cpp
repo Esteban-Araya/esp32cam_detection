@@ -100,20 +100,19 @@ void initCamera() {
   }
   // drop down frame size for higher initial frame rate
   s->set_framesize(s, FRAMESIZE_QVGA);    
-
-  ledcAttachPin(4, 4);  
-  ledcSetup(4, 5000, 8);
+  pinMode(4, OUTPUT);
 }
 
 String get_enocde_image() {
+  digitalWrite(4,1);
   camera_fb_t * fb = NULL;
-
+  
   fb = esp_camera_fb_get();  
   if(!fb) {
     Serial.println("Camera capture failed");
     return "Camera capture failed";
   }  
-
+  digitalWrite(4,0);
   char *input = (char *)fb->buf;
   char output[Base64.encodedLength(3)];
   String imageFile;
@@ -132,10 +131,10 @@ void request(){
   HTTPClient http;
   String datos_a_enviar = get_enocde_image();
   
-  http.begin("here you have to put the url");        //Indicamos el destino
+  http.begin("put url");        //Indicamos el destino
   http.addHeader("Content-Type", "plain-text"); //Preparamos el header text/plain si solo vamos a enviar texto plano sin un paradigma llave:valor.
 
-  int codigo_respuesta = http.POST(datos_a_enviar);   //Enviamos el post pasándole, los datos que queremos enviar. (esta función nos devuelve un código que guardamos en un int)
+  int codigo_respuesta = http.sendRequest("GET",(uint8_t *) datos_a_enviar.c_str(), datos_a_enviar.length());   //Enviamos el post pasándole, los datos que queremos enviar. (esta función nos devuelve un código que guardamos en un int)
 
   if(codigo_respuesta>0){
     Serial.println("Código HTTP ► " + String(codigo_respuesta));   //Print return code
