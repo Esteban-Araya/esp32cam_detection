@@ -160,21 +160,21 @@ void request(){
 void setup() {
   // put your setup code here, to run once:
   initWifi();
-  delay(3000);
+ 
   initCamera();
-  esp_camera_fb_return(esp_camera_fb_get());  
-   esp_camera_fb_return(esp_camera_fb_get());  
-    esp_camera_fb_return(esp_camera_fb_get());  
+
+
   Serial.println("Start");
-  delay(5000);
+  
   
 }
 
 void loop() {
   // put your main code here, to run repeatedly:
-  Serial.println("start loop---------------");
+
   
   
   request();
   delay(5000);
 }
+
