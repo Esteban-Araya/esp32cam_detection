@@ -27,8 +27,8 @@
 
 
 void initWifi(){
-  const char* ssid = "";
-  const char* password = "";
+  const char* ssid = "GuayFay";
+  const char* password = "noesunaclave";
   
   Serial.begin(115200);
   WiFi.begin(ssid, password);
@@ -65,6 +65,7 @@ void initCamera() {
   config.pin_reset = RESET_GPIO_NUM;
   config.xclk_freq_hz = 20000000;
   config.pixel_format = PIXFORMAT_JPEG;
+  config.grab_mode = CAMERA_GRAB_LATEST ;
   
   
   // WARNING!!! PSRAM IC required for UXGA resolution and high JPEG quality
@@ -105,9 +106,11 @@ void initCamera() {
 
 String get_enocde_image() {
   digitalWrite(4,1);
+  Serial.println("encode image");
   camera_fb_t * fb = NULL;
   
   fb = esp_camera_fb_get();  
+  
   if(!fb) {
     Serial.println("Camera capture failed");
     return "Camera capture failed";
@@ -121,17 +124,18 @@ String get_enocde_image() {
     if (i%3==0) imageFile += String(output);
   }
   
-  Serial.println(imageFile);
+  //Serial.println(imageFile);
 
   esp_camera_fb_return(fb);
   return imageFile;
 }
 
 void request(){
+  Serial.println("requestaaaaaaaaaaaaaaaa");
   HTTPClient http;
   String datos_a_enviar = get_enocde_image();
   
-  http.begin("put url");        //Indicamos el destino
+  http.begin("http://192.168.0.13:8000/");        //Indicamos el destino
   http.addHeader("Content-Type", "plain-text"); //Preparamos el header text/plain si solo vamos a enviar texto plano sin un paradigma llave:valor.
 
   int codigo_respuesta = http.sendRequest("GET",(uint8_t *) datos_a_enviar.c_str(), datos_a_enviar.length());   //Enviamos el post pasándole, los datos que queremos enviar. (esta función nos devuelve un código que guardamos en un int)
@@ -156,15 +160,21 @@ void request(){
 void setup() {
   // put your setup code here, to run once:
   initWifi();
-  Serial.println("Start");
+  delay(3000);
   initCamera();
-  pinMode(4, OUTPUT);
-  digitalWrite(4, LOW);
-  digitalWrite(4, 1);
-  request();
+  esp_camera_fb_return(esp_camera_fb_get());  
+   esp_camera_fb_return(esp_camera_fb_get());  
+    esp_camera_fb_return(esp_camera_fb_get());  
+  Serial.println("Start");
+  delay(5000);
   
 }
 
 void loop() {
   // put your main code here, to run repeatedly:
+  Serial.println("start loop---------------");
+  
+  
+  request();
+  delay(5000);
 }
