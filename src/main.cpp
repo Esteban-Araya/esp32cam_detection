@@ -158,13 +158,13 @@ void setup() {
   initWifi();
   Serial.println("Start");
   initCamera();
-  pinMode(4, OUTPUT);
-  digitalWrite(4, LOW);
-  digitalWrite(4, 1);
-  request();
+  
+  
   
 }
 
 void loop() {
   // put your main code here, to run repeatedly:
+request();
+delay(5000);
 }
