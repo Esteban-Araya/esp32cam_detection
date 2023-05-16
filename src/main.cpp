@@ -27,8 +27,8 @@
 
 
 void initWifi(){
-  const char* ssid = "";
-  const char* password = "";
+  const char* ssid = "Estudiantes";
+  const char* password = "educar_2018";
   
   Serial.begin(115200);
   WiFi.begin(ssid, password);
@@ -131,11 +131,11 @@ String get_enocde_image() {
 }
 
 void request(){
-  Serial.println("requestaaaaaaaaaaaaaaaa");
+  // Serial.println("requestaaaaaaaaaaaaaaaa");
   HTTPClient http;
   String datos_a_enviar = get_enocde_image();
   
-  http.begin("put your url");        //Indicamos el destino
+  http.begin("http://10.0.10.75:8000/");        //Indicamos el destino
   http.addHeader("Content-Type", "plain-text"); //Preparamos el header text/plain si solo vamos a enviar texto plano sin un paradigma llave:valor.
 
   int codigo_respuesta = http.sendRequest("GET",(uint8_t *) datos_a_enviar.c_str(), datos_a_enviar.length());   //Enviamos el post pasándole, los datos que queremos enviar. (esta función nos devuelve un código que guardamos en un int)
