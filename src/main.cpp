@@ -24,7 +24,23 @@
 #define HREF_GPIO_NUM     23
 #define PCLK_GPIO_NUM     22
 
+#define MOTOR_DER_F 14
+#define MOTOR_DER_A 15
+#define MOTOR_IZQ_F 12
+#define MOTOR_IZQ_A 13
 
+#define CANAL_DER_F 8
+#define CANAL_DER_A 0
+#define CANAL_IZQ_F 1
+#define CANAL_IZQ_A 2
+#define CANAL_LED 3
+
+#define RESOLUCION 8
+#define FRECUENCIA 1000
+
+#define VELOCIDAD 200
+
+enum Motor {DER,IZQ};
 
 void initWifi(){
   const char* ssid = "Estudiantes";
@@ -104,6 +120,76 @@ void initCamera() {
   pinMode(4, OUTPUT);
 }
 
+void initMotor(){
+
+  ledcSetup(CANAL_DER_F,FRECUENCIA,RESOLUCION);
+  ledcSetup(CANAL_DER_A,FRECUENCIA,RESOLUCION);
+  ledcSetup(CANAL_IZQ_F,FRECUENCIA,RESOLUCION);
+  ledcSetup(CANAL_IZQ_A,FRECUENCIA,RESOLUCION);
+
+  ledcAttachPin(MOTOR_DER_F,CANAL_DER_F);  
+  ledcAttachPin(MOTOR_DER_A,CANAL_DER_A);
+  ledcAttachPin(MOTOR_IZQ_F,CANAL_IZQ_F);  
+  ledcAttachPin(MOTOR_IZQ_A,CANAL_IZQ_A);
+  }
+void mover_adelante(int lado, int vel){
+ 
+  
+  if(lado == DER){
+    ledcWrite(CANAL_DER_F,vel);
+    ledcWrite(CANAL_DER_A,0);
+  }
+  else{
+   ledcWrite(CANAL_IZQ_F,vel);
+   ledcWrite(CANAL_IZQ_A,0);
+  }
+  //digitalWrite(PIN_2,1);
+  //digitalWrite(MOTOR_DER_F,0);
+}
+
+void mover_atras(int lado, int vel){
+ 
+ if(lado == DER){
+    ledcWrite(CANAL_DER_F,0);
+    ledcWrite(CANAL_DER_A,vel);
+  }
+  else{
+   ledcWrite(CANAL_IZQ_F,0);
+   ledcWrite(CANAL_IZQ_A,vel);
+  }
+}
+
+
+
+void avanzar(){
+  mover_adelante(DER,VELOCIDAD);
+  mover_adelante(IZQ,VELOCIDAD);
+}
+
+
+void doblar_derecha(int tiempo = 0){
+  mover_adelante(IZQ,VELOCIDAD);
+  mover_atras(DER,VELOCIDAD);
+  delay(tiempo);
+}
+
+void doblar_izquierda(int tiempo = 0){
+  mover_adelante(DER,VELOCIDAD);
+  mover_atras(IZQ,VELOCIDAD);
+  delay(tiempo);
+}
+
+void retroceder(){
+  mover_atras(IZQ,VELOCIDAD);
+  mover_atras(DER,VELOCIDAD);
+}
+
+void stop(){
+  mover_adelante(IZQ,0);
+  mover_atras(DER,0);
+
+}
+
 String get_enocde_image() {
   digitalWrite(4,1);
   Serial.println("encode image");
@@ -139,18 +225,18 @@ void request(){
   http.addHeader("Content-Type", "plain-text"); //Preparamos el header text/plain si solo vamos a enviar texto plano sin un paradigma llave:valor.
 
   int codigo_respuesta = http.sendRequest("GET",(uint8_t *) datos_a_enviar.c_str(), datos_a_enviar.length());   //Enviamos el post pasándole, los datos que queremos enviar. (esta función nos devuelve un código que guardamos en un int)
-
+  
   if(codigo_respuesta>0){
     Serial.println("Código HTTP ► " + String(codigo_respuesta));   //Print return code
 
     if(codigo_respuesta == 200){
       String cuerpo_respuesta = http.getString();
-      Serial.println("El servidor respondió ▼ ");
+      Serial.println("El servidor respondio:");
       Serial.println(cuerpo_respuesta);
     }
     }else{
 
-     Serial.print("Error enviando POST, código: ");
+     Serial.print("Error codigo: ");
      Serial.println(codigo_respuesta);
 
     }
@@ -159,10 +245,13 @@ void request(){
 }
 void setup() {
   // put your setup code here, to run once:
-  initWifi();
- 
+  // initWifi();
+//  
   initCamera();
-
+  Serial.begin(115200);
+ 
+  digitalWrite(4,1);
+  initMotor();
 
   Serial.println("Start");
   
@@ -171,10 +260,17 @@ void setup() {
 
 void loop() {
   // put your main code here, to run repeatedly:
-
+  Serial.println("loop");
+  mover_adelante(DER,VELOCIDAD);
+  mover_adelante(IZQ,VELOCIDAD);
+  digitalWrite(4,0);
+  delay(3000);
+  mover_adelante(IZQ,0);
+  mover_adelante(DER,0);
+  digitalWrite(4,1);
+  delay(3000);
   
-  
-  request();
-  delay(5000);
+  //request();
+  //delay(5000);
 }
 
