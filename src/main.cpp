@@ -134,7 +134,6 @@ void initMotor(){
   }
 void mover_adelante(int lado, int vel){
  
-  
   if(lado == DER){
     ledcWrite(CANAL_DER_F,vel);
     ledcWrite(CANAL_DER_A,0);
